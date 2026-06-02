@@ -1,0 +1,11 @@
+# Java compiled output
+*.class
+
+# macOS
+.DS_Store
+
+# Reference screenshots (local only)
+실행결과*.png
+
+# Cancelled iOS attempt (kept locally, not tracked)
+ios/

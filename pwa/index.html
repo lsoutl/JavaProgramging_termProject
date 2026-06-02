@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#1c1e24" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="531 Routine" />
+  <title>531 Routine</title>
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/svg+xml" href="icons/icon.svg" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <h1>531 Routine</h1>
+    <div class="topbar-actions">
+      <button id="btn-timer" class="icon-btn" title="휴식 타이머" aria-label="휴식 타이머">⏱</button>
+      <button id="btn-history" class="icon-btn" title="기록 보기" aria-label="기록 보기">📋</button>
+      <button id="btn-menu" class="icon-btn" title="메뉴" aria-label="메뉴">⋯</button>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- INPUT PANEL -->
+    <section id="input-panel" class="card input-card">
+      <h2 class="section-title">1RM 입력</h2>
+      <div class="input-grid">
+        <div class="input-row">
+          <img class="lift-icon" src="images/squat.jpg" alt="스쿼트" />
+          <label for="in-squat">스쿼트</label>
+          <div class="input-with-unit">
+            <input type="number" id="in-squat" inputmode="decimal" step="2.5" min="0" placeholder="0" />
+            <span class="unit">kg</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <img class="lift-icon" src="images/deadlift.jpg" alt="데드리프트" />
+          <label for="in-deadlift">데드리프트</label>
+          <div class="input-with-unit">
+            <input type="number" id="in-deadlift" inputmode="decimal" step="2.5" min="0" placeholder="0" />
+            <span class="unit">kg</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <img class="lift-icon" src="images/bench.jpg" alt="벤치프레스" />
+          <label for="in-bench">벤치프레스</label>
+          <div class="input-with-unit">
+            <input type="number" id="in-bench" inputmode="decimal" step="2.5" min="0" placeholder="0" />
+            <span class="unit">kg</span>
+          </div>
+        </div>
+        <div class="input-row">
+          <img class="lift-icon" src="images/press.jpg" alt="오버헤드프레스" />
+          <label for="in-press">오버헤드프레스</label>
+          <div class="input-with-unit">
+            <input type="number" id="in-press" inputmode="decimal" step="2.5" min="0" placeholder="0" />
+            <span class="unit">kg</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="options-grid">
+        <div class="option">
+          <label for="sel-phase">사이클 단계</label>
+          <select id="sel-phase">
+            <option value="FIRST_THREE">전3주 (1~3주차)</option>
+            <option value="LAST_THREE">후3주 (4~6주차)</option>
+            <option value="DELOAD">디로딩 (7주차)</option>
+          </select>
+        </div>
+        <div class="option">
+          <label for="sel-assist">보조 볼륨</label>
+          <select id="sel-assist">
+            <option value="None">없음</option>
+            <option value="FSL">FSL</option>
+            <option value="SSL">SSL</option>
+            <option value="BBB">BBB</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="actions">
+        <button id="btn-calc" class="btn primary">계산</button>
+        <button id="btn-reset" class="btn ghost">초기화</button>
+      </div>
+    </section>
+
+    <!-- EDIT BUTTON (visible after calc hides input panel) -->
+    <button id="btn-edit" class="btn ghost full hidden">1RM 수정</button>
+
+    <!-- RESULT STACK -->
+    <section id="results" class="results-stack"></section>
+  </main>
+
+  <!-- TIMER OVERLAY -->
+  <div id="timer-overlay" class="overlay hidden">
+    <div class="sheet">
+      <header class="sheet-header">
+        <h3>휴식 타이머</h3>
+        <button class="icon-btn close-btn" data-close="timer-overlay" aria-label="닫기">✕</button>
+      </header>
+      <div class="sheet-body">
+        <div class="timer-display">
+          <div id="timer-time">00:00</div>
+          <div class="progress-track"><div id="timer-bar" class="progress-fill"></div></div>
+        </div>
+        <div class="timer-controls">
+          <select id="timer-duration">
+            <option value="60">60초</option>
+            <option value="90" selected>90초</option>
+            <option value="120">120초</option>
+            <option value="180">180초</option>
+            <option value="300">300초</option>
+          </select>
+          <button id="timer-start" class="btn primary">시작</button>
+          <button id="timer-stop" class="btn ghost">정지</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY OVERLAY -->
+  <div id="history-overlay" class="overlay hidden">
+    <div class="sheet sheet-full">
+      <header class="sheet-header">
+        <button id="btn-history-back" class="icon-btn hidden" aria-label="뒤로">‹</button>
+        <h3 id="history-title">운동 기록</h3>
+        <div class="sheet-actions">
+          <button id="btn-add-record" class="btn primary small">+ PR</button>
+          <button class="icon-btn close-btn" data-close="history-overlay" aria-label="닫기">✕</button>
+        </div>
+      </header>
+      <div class="sheet-body">
+        <div id="history-list-view">
+          <div id="day-list"></div>
+          <div id="history-empty" class="empty-state">아직 기록이 없습니다.<br/>결과 카드에서 완료한 세트를 탭하면 기록됩니다.</div>
+        </div>
+        <div id="history-detail-view" class="hidden"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADD RECORD OVERLAY -->
+  <div id="record-overlay" class="overlay hidden">
+    <div class="sheet">
+      <header class="sheet-header">
+        <h3>기록 추가 / 추정 1RM</h3>
+        <button class="icon-btn close-btn" data-close="record-overlay" aria-label="닫기">✕</button>
+      </header>
+      <div class="sheet-body">
+        <div class="record-form">
+          <label>운동
+            <select id="rec-lift">
+              <option value="squat">스쿼트</option>
+              <option value="deadlift">데드리프트</option>
+              <option value="bench">벤치프레스</option>
+              <option value="press">오버헤드프레스</option>
+            </select>
+          </label>
+          <label>무게 (kg)
+            <input type="number" id="rec-weight" inputmode="decimal" step="2.5" min="0" />
+          </label>
+          <label>반복 횟수
+            <input type="number" id="rec-reps" inputmode="numeric" step="1" min="1" />
+          </label>
+          <div class="estimate-row">
+            추정 1RM: <strong id="rec-estimate">—</strong>
+          </div>
+          <div class="record-actions">
+            <button id="rec-save" class="btn primary">저장</button>
+            <button id="rec-apply" class="btn ghost">1RM에 반영</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MENU OVERLAY -->
+  <div id="menu-overlay" class="overlay hidden">
+    <div class="sheet">
+      <header class="sheet-header">
+        <h3>메뉴</h3>
+        <button class="icon-btn close-btn" data-close="menu-overlay" aria-label="닫기">✕</button>
+      </header>
+      <div class="sheet-body">
+        <button id="m-export" class="menu-item">데이터 내보내기 (JSON)</button>
+        <button id="m-import" class="menu-item">데이터 가져오기 (JSON)</button>
+        <button id="m-clear" class="menu-item danger">모든 데이터 초기화</button>
+        <input id="import-file" type="file" accept="application/json,.json" hidden />
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
